@@ -36,6 +36,7 @@ public:
     pyList<Type> & operator = (pyList<Type>);
     Type & operator [] (const long);
     const Type operator [] (const long) const;
+    pyList<Type> operator () (const long, const long, const long) const;
     pyList<Type> operator + (const pyList<Type> &) const;
     void operator += (const pyList<Type> &);
     pyList<Type> operator * (const long) const;
@@ -143,6 +144,27 @@ template<typename Type>
 const Type pyList<Type>::operator [] (const long index) const {
     long act_index = _transform_index(index);
     return Array[act_index];
+}
+
+template<typename Type>
+pyList<Type> pyList<Type>::operator () (const long start = 0, const long stop = LONG_MAX, const long step = 1) const {
+    if(step == 0){
+        throw std::invalid_argument("step cannot be zero");
+    }
+    long stop_clamped = _clamp(stop,-length-1,length);
+    stop_clamped = stop_clamped>=0? stop_clamped:stop_clamped + length;
+    long start_clamped = _clamp(start,-length, length-1);
+    start_clamped = start_clamped>=0? start_clamped: start_clamped + length;
+    pyList newList((std::abs(stop_clamped - start_clamped/step)+1)*2);
+    newList.Head = 0;
+    long ctr = 0;
+    long step_sgn = step/std::abs(step);
+    for(long i = start_clamped; step_sgn*i < step_sgn*stop_clamped ; i += step){
+        newList.Array[++ctr] = Array[_transform_index(i)];
+    }
+    newList.Tail = ctr;
+    newList.length = ctr;
+    return newList;
 }
 
 template<typename Type>
@@ -733,6 +755,7 @@ void pyList<Type>::insert(const long index, const Type key){
 int main(){
     using namespace std;
     pyList<pyList<int>> p = {{1,2,3},{3,4,5,7,8}};
+    cout << p(0,1) << endl;
     cout << p << endl;
 }
 
