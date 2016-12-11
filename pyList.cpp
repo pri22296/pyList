@@ -96,8 +96,23 @@ pyList<Type>::pyList(const pyList<Type> & rhs){
     }
 }
 
-template<typename Type>
+/*template<typename Type>
 pyList<Type>::pyList(const std::initializer_list<Type> source):pyList(RESIZE_FACTOR*source.size()){
+    std::cout << "init_list " << source.size() << " " << RESIZE_FACTOR*source.size() << std::endl;
+    for(Type item:source){
+        Array[++Tail] = item;
+    }
+    length = source.size();
+}*/
+
+template<typename Type>
+pyList<Type>::pyList(const std::initializer_list<Type> source){
+    Head = 0;
+    Tail = 0;
+    int required_size = RESIZE_FACTOR*source.size();
+    allocated = required_size>INITIAL_ARRAY_SIZE?required_size:INITIAL_ARRAY_SIZE;
+    Array = new Type[allocated];
+
     for(Type item:source){
         Array[++Tail] = item;
     }
@@ -754,8 +769,17 @@ void pyList<Type>::insert(const long index, const Type key){
 
 int main(){
     using namespace std;
-    pyList<pyList<int>> p = {{1,2,3},{3,4,5,7,8}};
-    cout << p(0,1) << endl;
+    pyList<pyList<int>> p = {{1,2,3},{3,4,5,7,8},{6,7,8,9}};
     cout << p << endl;
+    cout << p(1,2)[0](3,0,-1) << endl;
+    return 0;
 }
+
+/*int main(){
+    using namespace std;
+    pyList<int> p = {1,2,3,4,5,6};
+    cout << p << endl;
+    cout << p(1,5) << endl;
+    return 0;
+}*/
 
